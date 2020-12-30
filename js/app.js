@@ -1,43 +1,65 @@
-let playerMoveX = 101;
-let playerMoveY = 80;
-// -----------------------------
-let borderAreaLeft = 3;
-let borderAreaUp = 3;
-let borderAreaRight = 404;
-let borderAreaDown = 370;
-// -----------------------------
-let borderCollision = 50;
-// -----------------------------
-let enemyPosX = -100;
-
-// Generate position Y for enemy character
-let enemyPosY = function() {
-    let initYPositions = [60, 140, 220];
+const areaWidth = 505;
+const indentBorderLeft = 3;
+const indentBorderTop = 3;
+const indentBorderRight = 404;
+const indentBorderBottom = 370;
+const levelForWin = 10;
+// ---------------------------------------------
+const playerStartPosX = 205;
+const playerStartPosY = 380;
+const playerStepX = 101;
+const playerStepY = 80;
+// ---------------------------------------------
+const borderCollision = 50;
+// ---------------------------------------------
+const enemySpeedMax = 500;
+const enemySpeedMin = 150;
+//----------------------------------------------
+const enemyPosX = -100;
+const enemyPosY = function() {
+    const initYPositions = [60, 140, 220];
     let randY = Math.floor( Math.random() * 3);
 
     return initYPositions[randY];
 };
-//------------------------------
-let counter = document.createElement('div');
-counter.style.cssText = `
-    position: fixed; 
-    top: 10px; 
-    left: 50%;
-    font-family: sans-serif;
-    font-size: 30px; 
-    transform: translateX(-50%);
-`;
-
-counter.innerHTML = `Level: 1`;
-document.body.prepend(counter);
+//----------------------------------------------
+const levelCounter = document.createElement('div');
+//----------------------------------------------
 
 // Generate enemies' speed
 function enemySpeed() {
-    return Math.floor( Math.random() * (500 - 150) + 150);
+    return Math.floor( Math.random() * (enemySpeedMax - enemySpeedMin) + enemySpeedMin);
+}
+
+// Add a new enemy after level up
+function addEnemy() {
+    let enemy = new Enemy(enemyPosX, enemyPosY(), enemySpeed(), player);
+    allEnemies.push(enemy);
+}
+
+// Clear enemies if the player won or lose
+function clearEnemy() {
+    allEnemies = [];
+    addEnemy();
+}
+
+//Create level counter
+function addLevelCounter() {
+    levelCounter.style.cssText = `
+        position: fixed; 
+        top: 10px; 
+        left: 50%;
+        font-family: sans-serif;
+        font-size: 30px; 
+        transform: translateX(-50%);
+    `;
+
+    levelCounter.innerHTML = `Level: 1`;
+    document.body.prepend(levelCounter);
 }
 
 // Constructor for create enemy
-var Enemy = function(x, y, speed, player) {
+const Enemy = function(x, y, speed, player) {
     this.x = x;
     this.y = y;
     this.speed = speed;
@@ -50,23 +72,23 @@ Enemy.prototype.enemyCollision = function() {
         && this.y - borderCollision <= player.y     // Up
         && this.x + borderCollision >= player.x     // Right
         && this.y + borderCollision >= player.y) {  // Down
-        player.x = 205;
-        player.y = 380;
+        player.x = playerStartPosX;
+        player.y = playerStartPosY;
 
         setTimeout(function() {
             alert(`Game over...\nYou received ${player.lvl} level.`);
             player.lvl = 1;
             clearEnemy();
-            counter.innerHTML = `Level: 1`;
+            levelCounter.innerHTML = `Level: 1`;
         }, 100);
     }
-}
+};
 
 // Method for enemies update
 Enemy.prototype.update = function(dt) {
     this.enemyCollision();
 
-    if (this.x > 505) {
+    if (this.x > areaWidth) {
         this.x = enemyPosX;
         this.speed = enemySpeed();
     } else {
@@ -80,7 +102,7 @@ Enemy.prototype.render = function() {
 };
 
 // Constructor for create player
-let Player = function(x, y) {
+const Player = function(x, y) {
     this.x = x;
     this.y = y;
     this.sprite = 'images/char-horn-girl.png';
@@ -90,22 +112,22 @@ let Player = function(x, y) {
 // Method for player update
 Player.prototype.update = function() {};
 
-//Method for checking victory
-Player.prototype.checkWin = function() {
+//Method for checking game progress
+Player.prototype.checkProgress = function() {
     if (this.y < 0) {
 
         setTimeout(() => {
-            this.x = 205;
-            this.y = 380;
+            this.x = playerStartPosX;
+            this.y = playerStartPosY;
             this.lvl++;
-            counter.innerHTML = `Level: ${this.lvl}`;
+            levelCounter.innerHTML = `Level: ${this.lvl}`;
             addEnemy();
 
-            if (this.lvl === 10) {
+            if (this.lvl === levelForWin) {
                 alert('Victory!!!');
                 this.lvl = 1;
                 clearEnemy();
-                counter.innerHTML = `Level: 1`;
+                levelCounter.innerHTML = `Level: 1`;              
             } else {
                 alert(`Level UP!\nYour level is ${this.lvl}`);
             }
@@ -122,46 +144,27 @@ Player.prototype.render = function() {
 // Player controls
 Player.prototype.handleInput = function(btn) {
     if (btn === 'left') {
-        if (this.x > borderAreaLeft) {
-            this.x -= playerMoveX;
+        if (this.x > indentBorderLeft) {
+            this.x -= playerStepX;
         }
     } else if (btn === 'up') {
-        if (this.y > borderAreaUp) {
-            this.y -= playerMoveY;
+        if (this.y > indentBorderTop) {
+            this.y -= playerStepY;
 
-            this.checkWin(); 
+            this.checkProgress(); 
         }
     } else if (btn === 'right') {
-        if (this.x < borderAreaRight) {
-            this.x += playerMoveX;
+        if (this.x < indentBorderRight) {
+            this.x += playerStepX;
         }
     } else if (btn === 'down') {
-        if (this.y < borderAreaDown) { 
-            this.y += playerMoveY;
+        if (this.y < indentBorderBottom) { 
+            this.y += playerStepY;
         }
     }
 };
 
-// Create player character
-let player = new Player(205, 380);
-
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-let enemy = new Enemy(enemyPosX, enemyPosY(), enemySpeed(), player);
-let allEnemies = [enemy];
-
-function addEnemy() {
-    let enemy = new Enemy(enemyPosX, enemyPosY(), enemySpeed(), player);
-    allEnemies.push(enemy);
-}
-
-function clearEnemy() {
-    allEnemies = [];
-    addEnemy();
-}
-
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
+// This listens for key presses and sends the keys to Player.handleInput() method.
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
         37: 'left',
@@ -172,3 +175,15 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+// ---------------------------------------------
+// ---------------------------------------------
+// ---------------------------------------------
+// Create player character
+const player = new Player(playerStartPosX, playerStartPosY);
+
+// Create first enemy
+let enemy = new Enemy(enemyPosX, enemyPosY(), enemySpeed(), player);
+let allEnemies = [enemy];
+
+// Add level counter
+addLevelCounter();
