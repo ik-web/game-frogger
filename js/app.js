@@ -3,8 +3,10 @@ const indentBorderLeft = 3;
 const indentBorderTop = 3;
 const indentBorderRight = 404;
 const indentBorderBottom = 370;
-const levelForWin = 10;
+const levelForWin = 12;
 // ---------------------------------------------
+const playerSprite = 'images/char-horn-girl.png';
+const playerStartLevel = 1;
 const playerStartPosX = 205;
 const playerStartPosY = 380;
 const playerStepX = 101;
@@ -12,6 +14,7 @@ const playerStepY = 80;
 // ---------------------------------------------
 const borderCollision = 50;
 // ---------------------------------------------
+const enemySprite = 'images/enemy-bug.png';
 const enemySpeedMax = 500;
 const enemySpeedMin = 150;
 //----------------------------------------------
@@ -33,7 +36,7 @@ function enemySpeed() {
 
 // Add a new enemy after level up
 function addEnemy() {
-    let enemy = new Enemy(enemyPosX, enemyPosY(), enemySpeed(), player);
+    let enemy = new Enemy(enemyPosX, enemyPosY(), enemySprite, enemySpeed(), player);
     allEnemies.push(enemy);
 }
 
@@ -54,17 +57,34 @@ function addLevelCounter() {
         transform: translateX(-50%);
     `;
 
-    levelCounter.innerHTML = `Level: 1`;
+    levelCounter.innerHTML = `Level: ${playerStartLevel}`;
     document.body.prepend(levelCounter);
 }
 
-// Constructor for create enemy
-const Enemy = function(x, y, speed, player) {
+//----------------------------------------------
+// Constructor for create character
+const Character = function(x, y, sprite) {
     this.x = x;
     this.y = y;
-    this.speed = speed;
-    this.sprite = 'images/enemy-bug.png';
+    this.sprite = sprite;
 };
+
+// Method for character update
+Character.prototype.update = function() {};
+
+// Draw the character on the screen, required method for game
+Character.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+//----------------------------------------------
+// Constructor for create enemy
+const Enemy = function(x, y, sprite, speed, player) {
+    Character.call(this, x, y, sprite);
+    this.speed = speed;
+};
+
+Enemy.prototype = Object.create(Character.prototype);
 
 //Check characters collision
 Enemy.prototype.enemyCollision = function() {
@@ -96,21 +116,14 @@ Enemy.prototype.update = function(dt) {
     }
 };
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
+//----------------------------------------------
 // Constructor for create player
-const Player = function(x, y) {
-    this.x = x;
-    this.y = y;
-    this.sprite = 'images/char-horn-girl.png';
-    this.lvl = 1;
+const Player = function(x, y, sprite) {
+    Character.call(this, x, y, sprite);
+    this.lvl = playerStartLevel;
 };
 
-// Method for player update
-Player.prototype.update = function() {};
+Player.prototype = Object.create(Character.prototype);
 
 //Method for checking game progress
 Player.prototype.checkProgress = function() {
@@ -125,20 +138,15 @@ Player.prototype.checkProgress = function() {
 
             if (this.lvl === levelForWin) {
                 alert('Victory!!!');
-                this.lvl = 1;
+                this.lvl = playerStartLevel;
                 clearEnemy();
-                levelCounter.innerHTML = `Level: 1`;              
+                levelCounter.innerHTML = `Level: ${playerStartLevel}`;              
             } else {
                 alert(`Level UP!\nYour level is ${this.lvl}`);
             }
 
         }, 100);
     }
-};
-
-// Draw the player on the screen, required method for game
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 // Player controls
@@ -164,6 +172,7 @@ Player.prototype.handleInput = function(btn) {
     }
 };
 
+// ---------------------------------------------
 // This listens for key presses and sends the keys to Player.handleInput() method.
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
@@ -179,10 +188,10 @@ document.addEventListener('keyup', function(e) {
 // ---------------------------------------------
 // ---------------------------------------------
 // Create player character
-const player = new Player(playerStartPosX, playerStartPosY);
+const player = new Player(playerStartPosX, playerStartPosY, playerSprite);
 
 // Create first enemy
-let enemy = new Enemy(enemyPosX, enemyPosY(), enemySpeed(), player);
+let enemy = new Enemy(enemyPosX, enemyPosY(), enemySprite, enemySpeed(), player);
 let allEnemies = [enemy];
 
 // Add level counter
