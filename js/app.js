@@ -40,10 +40,15 @@ function addEnemy() {
     allEnemies.push(enemy);
 }
 
-// Reset game if the player won or lose
-function resetGame() {
+// Reset enemy if the player won or lose
+function resetEnemy() {
     allEnemies = [];
     addEnemy();
+}
+
+// Reset game if the player won or lose
+function resetGame() {
+    resetEnemy()
     player.level = playerStartLevel;
     setLevel(playerStartLevel);              
 }
@@ -195,8 +200,8 @@ document.addEventListener('keyup', function(e) {
 const player = new Player(playerStartPosX, playerStartPosY, playerSprite);
 
 // Create first enemy
-let enemy = new Enemy(enemyPosX, enemyPosY(), enemySprite, enemySpeed(), player);
-let allEnemies = [enemy];
+let allEnemies = [];
+addEnemy();
 
 // Add level counter
 addLevelCounter();
