@@ -1,4 +1,10 @@
 body {
-    text-align: center;
-    overflow: hidden;
+  height: 100vh;
+
+  text-align: center;
+  overflow: hidden;
+
+  background-image: url('../images/frogger-bg.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
