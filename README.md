@@ -8,11 +8,15 @@
   <img src="https://img.shields.io/badge/-javascript-yellow" alt="javascript">
 </p>
 
+<p align="center">
+  <a href="https://ik-web.github.io/game-frogger/">
+    [> DEMO LINK <]
+  </a> 
+</p>
+
 ## Description:
 
 The mini browser game is written in a third-party engine.
-
-[→ Try to play ←](https://ik-web.github.io/game-frogger/)
 
 ## Documentation
 
