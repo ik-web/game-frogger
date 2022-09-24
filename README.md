@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="readme-title.png" alt="Frogger">
+  <img src="readme-title.png" width="400" alt="Frogger">
 </div>
 
 <h1 align="center">
