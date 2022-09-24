@@ -1,5 +1,9 @@
+<div align="center">
+  <img src="readme-title.png" alt="Frogger">
+</div>
+
 <h1 align="center">
-  Game 'Frogger'
+  Game "Frogger"
 </h1>
 
 <p align="center">
